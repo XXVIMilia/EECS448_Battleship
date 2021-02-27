@@ -1,15 +1,15 @@
 import pygame
-from game_logic import run
+from subclass import game_logic
 
 # Initialize the pygame 
 pygame.init()
 
-# Create the screen
-#screen = pygame.display.set_mode((1000, 500))
+#Create gameLogic
+myGame = game_logic.gameLogic()
 
 # Setup.txt parser
 setupfile = open('setup.txt')
 SetupPacket = setupfile.readlines()
 setupfile.close()
 
-run(SetupPacket)
+myGame.run(SetupPacket)

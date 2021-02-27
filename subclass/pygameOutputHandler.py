@@ -3,7 +3,6 @@ import pygame as p
 import glob
 import os
 
-from pygame import event
 
 p.init()
 
@@ -24,15 +23,16 @@ class pyBoard:
     assetNameKeys = ["BS 1","BS 2","BS 3","BS 4","BS 5","BS 6","hit","miss"]
     ships = ["x1","x2","x3","x4","x5","x6"]
     
-    def __init__(self,assetsFolderPath = "/Assets/",screen = (850,850)):
+    def __init__(self,assetsFolderPath = "/defaultAssets/",screen = (850,850)):
         #PNG Info. Basically, I'm just digging through the provided assets folder and seeing if
         #it gives me anything containing my assetNameKeys, if it finds them, it stores that path
-        dir_path = os.path.dirname(os.path.realpath(__file__))
+        self.dir_path = os.path.dirname(os.path.realpath(__file__))
         #with my key in a dictionary. 
-        print(dir_path)
+        print(self.dir_path)
         print(assetsFolderPath)
+        self.assetFolderLocation = self.dir_path + assetsFolderPath
 
-        assetsFolder = glob.glob(dir_path + assetsFolderPath + "*")
+        assetsFolder = glob.glob(self.assetFolderLocation + "*")
         self.assetsList = {}
         for asset in assetsFolder:
             for key in self.assetNameKeys:
@@ -170,7 +170,7 @@ class pyBoard:
         self.screen = p.display.set_mode(size = (850,850))
         gameName = packet[0]
         p.display.set_caption(gameName)
-        icon = p.image.load(packet[1])
+        icon = p.image.load(self.assetFolderLocation + packet[1])
         p.display.set_icon(icon)
         self.gameBegin = 1
         self.createCleanPlate()
@@ -194,7 +194,7 @@ class pyBoard:
                     run = False
         p.quit()
 
-    #Bublic facing update call, will eventually use extra info 
+    #Public facing update call, will eventually use extra info 
     def updateBoard(self,mark,player,coord):
         self.addShot(mark,coord,player)
         self.__updateBoard(player)
