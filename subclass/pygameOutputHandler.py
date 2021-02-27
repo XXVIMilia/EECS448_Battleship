@@ -194,10 +194,17 @@ class pyBoard:
                     run = False
         p.quit()
 
-    #Public facing update call, will eventually use extra info 
-    def updateBoard(self,mark,player,coord):
+    def boardStateParser(self,pack):
+        mark = pack["StrikeVal"]
+        coord = pack["Coord"]
+        player = pack["Player"]
         self.addShot(mark,coord,player)
         self.__updateBoard(player)
+
+    #Public facing update call, will eventually use extra info 
+    def updateBoard(self,boardState, infoPacket):
+        if boardState == "board":
+            self.boardStateParser(infoPacket)
         p.display.flip()
 
 

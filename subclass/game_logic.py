@@ -11,14 +11,34 @@ class gameLogic():
     inputHandler = pygameInputHandler.inputHandler([50,50])
     board1 = []
     board2 = []
+    guesses_board1 = []
+    guesses_board2 = []
+    outputHandlerState = "board" #Possible values: board, setup, switch, game_end
+
+    boardViewPacket = {
+        "Player": 0,
+        "StrikeVal": "Miss",
+        "OutputText": "This is some test dialogue",
+        "Coord": ()
+    }
+
+    setupPacket = {
+        "PlayerVal": 0,
+        "MouseObject": object,
+        "OutputText": "More Test Dialogue"
+    }
 
     def __init__(self):
         for x in range(10):
             self.board1.append([])
             self.board2.append([])
+            self.guesses_board1.append([])
+            self.guesses_board2.append([])
             for y in range(10):
                 self.board1[x].append(" ")
                 self.board2[x].append(" ") 
+                self.guesses_board1[x].append(" ")
+                self.guesses_board2[x].append(" ")
 
         print(self.board1)
 
@@ -113,30 +133,7 @@ class gameLogic():
     # Now clear the screen, and the other player starts guessing
     print("\n" * 50)
 
-    guesses_board1 = [
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-    ]
-    guesses_board2 = [
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-    ]
+
     guessesBoards = [guesses_board1, guesses_board2]
 
     
@@ -270,6 +267,7 @@ class gameLogic():
 
             # Check that there are no repeats
             if self.placementBoards[self.player][row_number][column_number] == 'X':
+                stkVal = "Hit"
                 print("HIT!")
                 self.guessesBoards[self.player][row_number][column_number] = 'X'
                 if(self.player==0):
@@ -279,9 +277,14 @@ class gameLogic():
 
             else:
                 self.guessesBoards[self.player][row_number][column_number] = '.'
+                stkVal = "Miss"
                 print("MISS!")
 
             self.print_board(self.guessesBoards[self.player])
+            self.boardViewPacket["Player"] = self.player
+            self.boardViewPacket["StriveVal"] = stkVal
+            self.boardViewPacket["Coord"] = (column_number,row_number)
+            self.outputHandler.updateBoard(self.outputHandlerState,self.boardViewPacket)
 
             if(shipSpacesHit[0] != twoPlayerGuesses[0] and shipSpacesHit[1] != twoPlayerGuesses[1]):
                 self.switchplayers()
@@ -294,10 +297,6 @@ class gameLogic():
 
     def run(self,setupPack):
         self.outputHandler.beginGame(setupPack)#Spawns Screen
-        self.outputHandler.updateBoard("hit",player =1,coord = (1,1))
-
-
-        
         #Call placement twice for both players
         self.getNumShips()
         self.placement()
